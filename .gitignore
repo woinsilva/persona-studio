@@ -1,0 +1,13 @@
+.env
+data/
+models/
+comfy-data/
+__pycache__/
+.pytest_cache/
+
+.env.*
+!.env.example
+*.log
+*.pyc
+.venv/
+Thumbs.db

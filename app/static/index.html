@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#11100e" />
+  <title>Persona Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <div class="grain"></div>
+  <header>
+    <a class="brand" href="#"><span class="brand-mark">P</span><span>Persona Studio</span></a>
+    <div class="status-pill" id="system-status"><span></span> verificando sistema</div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <p class="eyebrow">Retratos consistentes · execução local</p>
+      <h1>Uma identidade.<br><em>Infinitas histórias.</em></h1>
+      <p class="subtitle">Use uma fotografia como referência e crie cenas realistas mantendo os traços do mesmo personagem.</p>
+    </section>
+
+    <section class="workspace">
+      <aside class="characters-panel">
+        <div class="section-heading"><div><span>01</span><h2>Personagem</h2></div><button class="icon-button" id="new-character" title="Novo personagem">+</button></div>
+        <div id="character-list" class="character-list"></div>
+        <button class="add-card" id="empty-add"><span>+</span><strong>Adicionar referência</strong><small>Rosto nítido, luz uniforme</small></button>
+      </aside>
+
+      <section class="creator-panel">
+        <div class="section-heading"><div><span>02</span><h2>Descreva a cena</h2></div></div>
+        <form id="generation-form">
+          <label for="prompt">O que você quer criar?</label>
+          <textarea id="prompt" required minlength="3" placeholder="Ex.: Retrato editorial em uma rua de Paris ao entardecer, usando sobretudo bege, olhando para a câmera..."></textarea>
+          <div class="suggestions">
+            <button type="button" data-prompt="Retrato cinematográfico em uma cafeteria elegante, luz suave da janela, roupa casual sofisticada, olhando para a câmera">Café editorial</button>
+            <button type="button" data-prompt="Fotografia de viagem na praia ao pôr do sol, roupa de linho branca, vento suave, expressão natural e espontânea">Pôr do sol</button>
+            <button type="button" data-prompt="Retrato profissional em estúdio minimalista, fundo cinza quente, blazer escuro, luz Rembrandt, enquadramento do peito para cima">Headshot</button>
+          </div>
+
+          <details>
+            <summary>Controles avançados <span>⌄</span></summary>
+            <div class="advanced-grid">
+              <div><label for="ratio">Formato</label><select id="ratio"><option value="1024x1024">Quadrado · 1:1</option><option value="896x1152">Retrato · 4:5</option><option value="1152x896">Paisagem · 5:4</option><option value="768x1344">Stories · 9:16</option></select></div>
+              <div><label for="fidelity">Fidelidade <output id="fidelity-value">105%</output></label><input id="fidelity" type="range" min="35" max="135" value="105" /></div>
+              <div class="wide"><label for="negative">Evitar (opcional)</label><input id="negative" placeholder="Ex.: óculos, sorriso, fundo movimentado" /></div>
+              <label class="check wide"><input type="checkbox" id="enhance" checked><span></span> Otimizar descrição com Ollama</label>
+            </div>
+          </details>
+          <button class="generate-button" id="generate-button" type="submit"><span class="spark">✦</span><span>Gerar imagem</span><small>GPU local</small></button>
+        </form>
+      </section>
+    </section>
+
+    <section class="gallery-section">
+      <div class="gallery-header"><div><p class="eyebrow">Seu acervo</p><h2>Criações recentes</h2></div><button id="refresh">Atualizar</button></div>
+      <div class="gallery" id="gallery"></div>
+    </section>
+  </main>
+
+  <dialog id="character-dialog">
+    <form id="character-form" method="dialog">
+      <button class="close" type="button" id="close-dialog">×</button>
+      <p class="eyebrow">Nova identidade</p><h2>Crie seu personagem</h2>
+      <label class="dropzone" id="dropzone" for="photo"><input id="photo" type="file" accept="image/jpeg,image/png,image/webp" required><img id="photo-preview" alt="Prévia"><span class="upload-icon">↥</span><strong>Escolha uma foto</strong><small>Prefira um retrato frontal, nítido e sem óculos</small></label>
+      <label for="character-name">Nome do personagem</label><input id="character-name" maxlength="80" placeholder="Ex.: Marina" required>
+      <button class="primary" type="submit">Salvar personagem</button>
+    </form>
+  </dialog>
+  <div class="toast" id="toast"></div>
+  <script src="/app.js"></script>
+</body>
+</html>

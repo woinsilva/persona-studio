@@ -1,0 +1,71 @@
+name: persona-studio
+
+services:
+  app:
+    build: ./app
+    container_name: persona-studio-app
+    restart: unless-stopped
+    ports:
+      - "${APP_PORT:-8080}:8080"
+    environment:
+      DATA_DIR: /app/data
+      OLLAMA_URL: http://ollama:11434
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-qwen3:8b}
+      COMFYUI_URL: http://comfyui:8188
+      COMFY_CHECKPOINT: ${COMFY_CHECKPOINT:-RealVisXL_V4.0.safetensors}
+      INSTANTID_MODEL: ${INSTANTID_MODEL:-ip-adapter.bin}
+      INSTANTID_CONTROLNET: ${INSTANTID_CONTROLNET:-instantid-controlnet.safetensors}
+    volumes:
+      - ./data:/app/data
+    depends_on:
+      ollama:
+        condition: service_healthy
+      comfyui:
+        condition: service_started
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: persona-studio-ollama
+    restart: unless-stopped
+    gpus: all
+    ports:
+      - "${OLLAMA_PORT:-11434}:11434"
+    environment:
+      # Libera a VRAM antes de o ComfyUI carregar o SDXL.
+      OLLAMA_KEEP_ALIVE: ${OLLAMA_KEEP_ALIVE:-0s}
+      OLLAMA_MAX_LOADED_MODELS: "1"
+      OLLAMA_NUM_PARALLEL: "1"
+      OLLAMA_FLASH_ATTENTION: "1"
+    volumes:
+      - ollama_data:/root/.ollama
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 15s
+
+  comfyui:
+    build: ./comfyui
+    container_name: persona-studio-comfyui
+    restart: unless-stopped
+    gpus: all
+    ports:
+      - "${COMFYUI_PORT:-8188}:8188"
+    command: ["python", "./main.py", "--listen", "0.0.0.0", "--lowvram"]
+    volumes:
+      - ./models:/comfyui/models
+      - ./comfy-data/input:/comfyui/input
+      - ./comfy-data/output:/comfyui/output
+      - ./comfy-data/user:/comfyui/user
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8188/system_stats')\""]
+      interval: 15s
+      timeout: 8s
+      retries: 30
+      start_period: 45s
+
+volumes:
+  ollama_data:
+    external: true
+    name: ${OLLAMA_VOLUME:-video_ollama_data}
